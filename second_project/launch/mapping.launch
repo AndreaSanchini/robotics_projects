@@ -1,0 +1,23 @@
+<launch>
+	<!-- Set sim time -->
+	<param name="use_sim_time" value="true"/>
+	
+	<!-- Convert PointCloud to LaserScan -->
+	<node name="pointcloud_to_laserscan" pkg="pointcloud_to_laserscan" type="pointcloud_to_laserscan_node" output="screen">
+		<remap from="cloud_in" to="ugv/rslidar_points"/>
+	</node>
+	
+	<!-- Start nodes that publish TFs -->
+	<node name="odom_tf_publisher" pkg="second_project" type="odom_tf_publisher" output="screen"/>
+	<node pkg="tf" type="static_transform_publisher" name="static_tf_pub" args="0 0 0 0 0 0 base_link rslidar 100"/>
+	
+	<!-- Start SlamToolbox-->
+	<node name="slam_toolbox" pkg="slam_toolbox" type ="async_slam_toolbox_node" output="screen">
+		<rosparam command="load" file="$(find second_project)/cfg/st_config.yaml"/>
+	</node>
+	
+	<!-- Open Rviz-->
+	<node name="rviz" pkg="rviz" type="rviz" args="-d $(find second_project)/rviz/mapping_config.rviz"/>
+	
+</launch>
+

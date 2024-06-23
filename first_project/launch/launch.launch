@@ -1,0 +1,33 @@
+<launch>
+	<!-- set global params -->
+	<param name="lat_r" value="45.477669461666665" />
+	<param name="lon_r" value="9.22674018" />
+	<param name="alt_r" value="169.039" />
+	
+	<!-- publish odometry from gps -->
+	<node pkg="first_project" type="gps_to_odom" name="gps_to_odom" output="screen"></node>
+	
+	<!-- publish odometry from wheel encoders as tf -->
+	<node pkg="first_project" type="odom_to_tf" name="odom_to_tf_wheels" output="screen">
+		<param name="root_frame" type="string" value="world"/>
+		<param name="child_frame" type="string" value="wheel_odom"/>
+		<remap from="odom_to_tf_wheels/input_odom" to="odom"/>
+	</node>
+	
+	<!-- publish odometry from gps as tf -->
+	<node pkg="first_project" type="odom_to_tf" name="odom_to_tf_gps" output="screen">
+		<param name="root_frame" type="string" value="world"/>
+		<param name="child_frame" type="string" value="gps_odom"/>
+		<remap from="odom_to_tf_gps/input_odom" to="gps_odom"/>
+	</node>
+	
+	<!-- lidar visualization -->
+	<node pkg="first_project" type="lidar_remap" name="lidar_remap" output="screen"></node>
+	
+	<!-- launch rviz -->
+	<node pkg="rviz" type="rviz" name="rviz" args="-d $(find first_project)/rviz_config.rviz"></node>
+	
+	<!-- launch rqt_reconfigure -->
+	<node pkg="rqt_reconfigure" type="rqt_reconfigure" name="rqt_reconfigure"></node>
+	
+</launch>
